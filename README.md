@@ -1,10 +1,12 @@
 # Reactive on JVM
 
 ## Reactive Manifesto
-- Responsive
-- Elastic
-- Resilient
-- Message driven
+
+For an application to be reactive it has to the meet the requirements as specified in the  reactive manifesto, which are -
+    - Responsiveness
+    - Elasticity
+    - Resiliency
+    - Message driven communication
 
 [Read more](https://www.reactivemanifesto.org/)
 

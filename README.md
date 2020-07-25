@@ -2,7 +2,7 @@
 
 ## Reactive Manifesto
 
-For an application to be reactive it has to the meet the requirements as specified in the  reactive manifesto, which are -
+- For an application to be reactive it has to the meet the requirements as specified in the  reactive manifesto, which are -
     - Responsiveness
     - Elasticity
     - Resiliency

@@ -39,9 +39,12 @@ The word `Observable` or `Flowable` is used to mean a reactive stream of data. A
 
 > Hot Observables typically are candidates for using backpressure flow control strategies such as throttling, buffers, or windows.
 
+<br/>
+
 ### Backpressure
 
-- Backpressure is what happens when there are too many events/data in a stream than the downstream can handle. When this happens in the downstream application, it can cause big problems like OutOfMemory exceptions or starved threads and timeouts. 
+- Backpressure is what happens when there are too many events/data in a stream than the downstream can handle. When this happens in the downstream application, it can cause big problems like OutOfMemory exceptions or starved threads and timeouts.
+ 
 - **Backpressure strategies** help us deal with these problems proactively to avoid these problems. There are multiple backpressure strategies as discussed below -  
     - **Dropping**: We simply drop the items above what can be handled (using some criteria such as oldest or newest).
     - **Buffer**: Buffer keeps data over some time period and sticks it in a list, then observes each list. It caches all elements from a stream if too many elements were produced than the subscriber could handle. In this case the buffer is kept in memory and does not affect the data type of the stream. If buffer is used, we have the option of dropping or ignoring any elements above the buffer’s maximum size. 

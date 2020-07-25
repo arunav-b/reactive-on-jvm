@@ -51,11 +51,19 @@ The word `Observable` or `Flowable` is used to mean a reactive stream of data. A
 
 ## RxJava
 
+<br/>
+
 ## Reactor
+
+<br/>
 
 ## Akka Streams
 
+<br/>
+
 ## Smallrye Mutiny
+
+<br/>
 
     
 ## References

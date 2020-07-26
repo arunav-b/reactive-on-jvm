@@ -1,0 +1,7 @@
+Lab 1 - In this lab we'll create a producer and a subscriber.
+
+The producer takes in a list of ticker symbols, goes out to a (simulated) service that gives stock price, and produces the symbol and the price. Let the producer emit the data at the rate of one value per second. Once data for all symbols are emitted, the producer will repeat the loop of sending the data for the tickers, one at a time.
+
+The subscriber receives the data from the producer and prints out the ticker symbol and the $price.
+
+Let's keep the program running until the user hits return.

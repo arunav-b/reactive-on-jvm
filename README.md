@@ -119,7 +119,7 @@ Support for Reactive Streams has been added to the JDK, Java 9 onwards. Several 
 - `distinct` 
 - `elementAt`
 
-> Actions Taken by `take`
+> Actions taken by `take`
 > 1. It will stop data flow once that number of data is reached.
 > 2. It sends a complete signal down stream
 > 3. It sends a unsubscribe signal up stream
@@ -196,6 +196,8 @@ Support for Reactive Streams has been added to the JDK, Java 9 onwards. Several 
 - ExecutorService
 
 ### 2.4.c. subscribeOn() vs observeOn()
+
+<br/>
 
 ## 2.5. Backpressure
 

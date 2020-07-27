@@ -1,4 +1,4 @@
-package com.arunav.learning.rxjava.labs.stockprice;
+package com.arunav.learning.rxjava.labs.lab1.stockprice;
 
 import java.util.Arrays;
 import java.util.List;

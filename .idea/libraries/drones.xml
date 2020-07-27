@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="drones">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../study/venkat tutorials/live-classes/reactive-prog/NMII4J070120/lib/drones.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

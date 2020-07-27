@@ -1,0 +1,16 @@
+A DroneLocator (in drones.jar) has the following method:
+
+DroneLocator.fetch(String droneID);
+
+Calling this method will result in an Observable that will emit the location of the drone periodically.
+
+For example, DroneLocator.fetch("DR01");
+
+Subscribe to the Observable returned by fetch and print the location detail
+received.
+
+If the Observable terminates, report the completion of data emits by displaying a message "The drone has landed" and end the program.
+
+When the user keys in a "end" ask the Observable to stop emitting data.
+
+If the user does not enter "end" or enters something else, continue displaying drone location, but only up to a 100 values.

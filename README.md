@@ -2,7 +2,7 @@
 
 ## 1.1. Reactive Manifesto
 
-- For an application to be reactive it has to the meet the requirements as specified in the  reactive manifesto, which are -
+- For an application to be reactive it has to the meet the requirements as specified in the reactive manifesto, which are -
     - Responsiveness
     - Elasticity
     - Resiliency
@@ -56,101 +56,101 @@ Support for Reactive Streams has been added to the JDK, Java 9 onwards. Several 
 
 # 2. RxJava
 
-## 2.1. Basics - Working with Publishers & Subscribers:
+> Refer to the documentation [here](http://reactivex.io/RxJava/javadoc/)    
 
-### 2.1.a. The Observable 
+## 2.1. Basics - `Observable` & `Observer`:
 
-- `Observable.create()`
-- `Observable.just()`
+### 2.1.a. Creating an `Observable` 
 
-### 2.1.b. Observable Sources
+- `Observable.create()`:  
+    The `Observable.create()` factory allows us to create an Observable by providing a lambda that accepts an Observable emitter of type `ObservableOnSubscribe` that has one method `subscribe(ObservableEmitter emitter)`. `ObservableEmitter` extends `Emitter` interface which has the 3 methods - `onNext()`, `onError()` and `onComplete()`.
+    - The emitter's `onNext()` method passes emissions or data down the chain of operators to the `Observer`. The `onNext()` is invoked inside the `Observer`, until then it is lazily evaluated in the `Observable`. 
+    - `onComplete()` signals that there are no more items in the stream.
+    - In case of any error on the stream the `onError()` method signals that there is an error in the data stream and no more data is sent henceforth. 
+    - The `subscriber()` method on the `Observer` is overloaded multiple times, that accepts multiple functions for the different signals sent by the emitter.
+    - The `onNext()`, `onComplete()`, and `onError()` methods of the emitter do not necessarily push the data directly to the final Observer. There can be another operator (like `map()` or `filter()`) between the source `Observable` and its `Observer` that acts as the next step in the chain.
 
-- `Observable.range()` 
-- `Observable.interval()`  
-- `Observable.future()` 
-- `Observable.empty()` 
-- `Observable.never()` 
-- `Observable.error()` 
-- `Observable.defer()` 
-- `Observable.fromCallable()`
+### 2.1.b. Some `Observable` sources
 
-### 2.1.c. Reactive Stream channels 
+- `Observable.just()`: Using `Observable.just()` we can get data from non-reactive sources. Upto 10 items can be emitted using `just()`.  
+- `Observable.fromIterable()`: We can pass a list of items in the `fromIterable()` method to create an Observable.
+- `Observable.range()`: Creates an Observable that emits a consecutive range of integers, from a specified start value and increments each subsequent value by one until the specified count is reached.  
+- `Observable.interval()`: Emits infinite values from a specified start value at specified time intervals. 
+- `Observable.empty()`: Creates an Observable that emits nothing and calls `onComplete()`. 
+- `Observable.defer()`: For Observable sources to capture changes to state we can use `Observable.defer()`, which accepts a lambda Supplier and creates an Observable for every subscription and, thus, reflects any change in its parameters.
+- `Observable.fromCallable()`: In order to pass an exception generated even before the creation of an Observable and we want to pass that down the Observable chain, we can use `Observable.fromCallable()`.
 
-- Reactive Streams have 3 channels -
-    - data channel: Channel through which data is sent
-    - error channel: Channel through which an error maybe sent
-    - complete channel: Channel through which a completed signal is sent 
+> There are a few specialized flavors of `Observable` that are explicitly set up for one or no emissions: `Single`, `Maybe`, and `Completable`. 
 
-- Once a completed signal is sent, no data will pass through the data channel.
-- Once an error is generated, it will never pass a data through the data channel.
+[Read More](http://reactivex.io/documentation/observable.html)
 
-### 2.1.d. `Flowable` methods:
+### 2.1.c. `Observer` Interface
 
-- `onNext()`: emits the next data in the stream
-- `onComplete()`: signals that we are done, no more data will be sent
-- `onError()`: signals that an error or exception occurred and no more data will be sent
+- The `Observer<T>` interface has 4 methods - `onNext()`,`onError()`, `onComplete()` and `onSubscribe()`. We already saw about the first 3 methods when we talked about `ObservableOnSubscribe`. We'll look into the other method in the next section. 
 
-### 2.1.e. Unsubscribe:
+### 2.1.d. Unsubscribing:
 
+- The `onSubscribe()` method of the `Observer` interface takes in a `Disposable`.
 - `dispose()` when called on a `Disposable` sends a signal from the subscriber to the producer to stop emitting data.
 - When multiple subscribers are around and one of them sends a `dispose()` signal, then the producer doesn't stop sending the data.   
-
-### 2.1.f. Error Handling
-
-- Handle errors using `onError()` and pass it on to the subscriber
-- Support Resilience using `onErrorResumeNext()`
 
 <br/> 
 
 ## 2.2. Basic Operators: 
 
 ### 2.2.a. Conditional
+> Emit or transform `Observable` conditionally
 
-- `takeWhile`: Takes records until the condition is true inside the `takeWhile()` method.
-- `skipWhile`: Skips records based on the condition passed inside `skipWhile()` method. 
-- `defaultIfEmpty`
-- `switchIfEmpty`
+- `takeWhile`: Takes emissions until the condition is true inside the `takeWhile()` method.
+- `skipWhile`: Skips emissions based on the condition passed inside `skipWhile()` method. 
+- `defaultIfEmpty`: If we want to resort to a single emission when a given `Observable` turns out to be empty, we can use `defaultIfEmpty()`.
+- `switchIfEmpty`: Specifies a different `Observable` to emit values from if the source `Observable` is empty.
 
 ### 2.2.b. Suppressing
-
-- `filter`
-- `take`: Takes the number of records from the stream specified inside the `take()` method. 
-- `skip`: Skips the number of records from the stream specified inside the `skip()` method.
-- `distinct` 
-- `elementAt`
-
-> Actions taken by `take`
-> 1. It will stop data flow once that number of data is reached.
-> 2. It sends a complete signal down stream
-> 3. It sends a unsubscribe signal up stream
+>  Operators that suppress emissions that do not meet the specified criterion. These operators work by simply not calling the `onNext()` function downstream for a disqualified emission, and therefore it does not go down the chain to Observer.
+ 
+- `filter`: Accepts a `Predicate<T>`. If the `Predicate` returns `true` emission is passed downstream else will not allow to pass.
+- `take`: Allows specified number of emissions from Observable, calls `onComplete()` and dispose of the subscription for no more emissions. 
+- `skip`: Skips the specified number of emissions from upstream.
+- `distinct`: Emits unique emissions and suppresses any duplicates.
+- `distinctUntilChanged`: Ignores consecutive duplicate emissions. If the same value is being emitted repeatedly, all the duplicates are ignored until a new value is emitted.
+- `elementAt`: We can get a specific emission by its index specified by the long value, starting at 0. After the item is found and emitted, `onComplete()` is called and the subscription is disposed of.
 
 ### 2.2.c. Transforming
+> These operators transform emissions 
 
-- `map`
-- `cast`
-- `startWithItem`
-- `sorted`
-- `scan`
+- `map`: For a given `Observable<T>`, the `map()` operator transforms an emitted value of the `T` type into a value of the `R` type using the `Function<T,R>` lambda expression.
+- `startWithItem`: (`startWith()` in RxJava 2.x) allows us to insert a value of type `T` that will be emitted before all other values. For more than one value we can use `startWithArray()` which accepts `varargs` or `startWithIterable()` which accepts an iterable. 
+- `sorted`: For a finite `Observable<T>` that emits items of primitive type, `String` type, or objects that implement `Comparable<T>`, we can use `sorted()` to sort the emissions. Internally, it collects all the emissions and then re-emits them in the specified order. 
+- `scan`: Its a rolling aggregator that adds every emitted item to the provided accumulator and emits each incremental accumulated value. 
 
 ### 2.2.d. Reducing
+> For a finite set of emissions we can aggregate them to a single value using reducing operators.
 
-- `count`
-- `reduce`
+- `count`: The `count()` operator counts the number of emitted items and emits the result through a `Single` once `onComplete()` is called.
+- `reduce`: Similar to `scan` but only emits the final result.
+- Boolean operators: A sub-category of reducing operators that evaluate the result to a boolean value and return a `Single<Boolean>` object.
+    - `all`: Verifies that all emissions meet the specified criterion and returns a `Single<Boolean>` object. If they all pass, it returns the `Single<Boolean>` object that contains `true`. If it encounters one value that fails the criterion, it immediately calls `onComplete()` and returns the object that contains `false`.
+    - `any`: Checks whether at least one emission meets a specified criterion and returns a `Single<Boolean>`. The moment it finds an emission that does, it returns a `Single<Boolean>` object with `true` and then calls `onComplete()`. 
+    - `isEmpty`: Checks whether an `Observable` is going to emit more items. It returns a `Single<Boolean>` with `true` if the `Observable` does not emit items anymore.
+    - `contains`: Checks whether the specified item has been emitted by the source `Observable`.
 
 ### 2.2.e. Collection
+> Collection operators accumulates all emissions into a collection such as a List or Map and then returns the entire collection as a single value.
 
-- `toList`
-- `toMap`
-- `collect`
+- `toList`: For a given `Observable<T>`, it collects incoming items into a `List<T>` and then pushes that `List<T>` object as a single value through `Single<List<T>`.
+- `toMap`: For a given `Observable<T>`, the `toMap()` operator collects received values into `Map<K,V>`. The key(`K`) is generated by the `Function<V,K>` function provided as the argument. 
+- `collect`: We can use `collect(Callable<U> initialValueSupplier, BiConsumer<U,T> collector)` to specify a custom type for collecting items to, like `Set` or any other data structure other than `List` or `Map`.
 
 ### 2.2.f. Error Recovery
+> Sometimes we want to intercept exceptions before they get to the `Observer` and attempt some form of recovery and may even pretend that the error never happened and continue processing. 
 
-- `onErrorReturnItem`
-- `onErrorReturn`
-- `onErrorResumeWith`
-- `retry`
+- `onErrorReturnItem` & `onErrorReturn`: When we want to resort to a default value when an exception occurs, we can use the `onErrorReturnItem()` operator. We can also use the `onErrorReturn(Function<Throwable,T> valueSupplier)` operator to dynamically produce the value using the specified function.
+- `onErrorResumeWith`: (previously `onErrorResumeNext()` in RxJava2) It accepts another `Observable` as a parameter to emit potentially multiple values, not a single value, in the event of an exception.
+- `retry`: This will re-subscribe the preceeding Observable to not have the error again. We can specify the number of times to retry. 
 
 ### 2.2.g. Action
+> Action operators help in debugging and get a visibility into an `Observable` chain.
 
 - `doOnNext` & `doAfterNext`
 - `doOnComplete` & `doOnError`
@@ -161,12 +161,13 @@ Support for Reactive Streams has been added to the JDK, Java 9 onwards. Several 
 - `doFinally`
 
 ### 2.2.h. Utility
+> Miscellaneous operators cannot be categorized in any of the above types. 
 
-- `delay`
-- `repeat`
-- `single`
-- `timestamp`
-- `timeInterval`
+- `delay`: Will postpone emissions by the specified time. 
+- `repeat`: Will repeat subscription after `onComplete()` a specified number of times. 
+- `single`: Returns a `Single` that emits the item emitted by the `Observable`. If the Observable emits more than one item, the `single()` operator throws an exception. If the Observable emits no item, it emits the default item passed to the operator as a parameter.
+- `timestamp`: Attaches a timestamp to every item emitted by an `Observable`.
+- `timeInterval`: Emits the time lapses between the consecutive emissions of a source `Observable`.
 
 <br/> 
 
@@ -182,11 +183,20 @@ Support for Reactive Streams has been added to the JDK, Java 9 onwards. Several 
 
 <br/>
 
-## 2.4. Concurrency & Parallelism
+### 2.4. Error Handling
 
-### 2.4.a. Hot vs Cold observables
+- Handle errors using `onError()` and pass it on to the subscriber
+- Circuit breaker - Supporting resilience using `onErrorResumeNext()`
 
-### 2.4.b. Threads
+<br/> 
+
+## 2.5. Concurrency & Parallelism
+
+### 2.5.a. Hot vs Cold observables
+
+- 
+
+### 2.5.b. Threads
 
 - Computation
 - IO
@@ -195,13 +205,13 @@ Support for Reactive Streams has been added to the JDK, Java 9 onwards. Several 
 - Trampoline
 - ExecutorService
 
-### 2.4.c. subscribeOn() vs observeOn()
+### 2.5.c. subscribeOn() vs observeOn()
 
 <br/>
 
-## 2.5. Backpressure
+## 2.6. Backpressure
 
-### 2.5.a. Backpressure Strategies
+### 2.6.a. Backpressure Strategies
 
 - Buffering
 - Windowing

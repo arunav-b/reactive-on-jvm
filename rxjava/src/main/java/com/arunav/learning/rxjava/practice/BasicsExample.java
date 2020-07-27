@@ -1,10 +1,10 @@
 package com.arunav.learning.rxjava.practice;
 
-import io.reactivex.rxjava3.core.BackpressureStrategy;
-import io.reactivex.rxjava3.core.Flowable;
-import io.reactivex.rxjava3.core.FlowableEmitter;
-import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
+import io.reactivex.FlowableEmitter;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 import java.util.concurrent.TimeUnit;
 
@@ -13,25 +13,22 @@ import java.util.concurrent.TimeUnit;
 
 public class BasicsExample {
 
-    // Observable/Flowable/Stream of data running on a different thread
+    // Flowable running on a different thread
     public static Flowable<Long> create() {
         return Flowable.interval(0, 1, TimeUnit.SECONDS);
     }
 
     // custom producer
     private static Flowable<Integer> createPublisher() {
-        return Flowable.<Integer>create(emitter -> emit(emitter), BackpressureStrategy.BUFFER);
+        return Flowable.create(emitter -> emit(emitter), BackpressureStrategy.BUFFER);
     }
 
     // Is invoked lazily
-    private static void emit(FlowableEmitter<Integer> emitter) {
+    private static void emit(FlowableEmitter<Integer> emitter) throws InterruptedException {
         System.out.println("Emitting.." + Thread.currentThread()); // lazy evaluation
         int count = 0;
-        while (count++ < 1000) {
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException ignored) {
-            }
+        while (count++ < 100) {
+            Thread.sleep(200);
             emitter.onNext(count); // Mouth of data channel
         }
     }

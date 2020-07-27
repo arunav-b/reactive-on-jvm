@@ -1,6 +1,6 @@
-package com.arunav.learning.rxjava.labs.stockprice;
+package com.arunav.learning.rxjava.labs.lab1.stockprice;
 
-import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.Flowable;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;

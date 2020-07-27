@@ -175,28 +175,24 @@ Support for Reactive Streams has been added to the JDK, Java 9 onwards. Several 
 
 ### 2.3.a. Merge
 
+- `Observable.merge()` will take two or more `Observable<T>` sources emitting the same type `T` and then consolidate them into a single `Observable<T>`. Alternatively, we can use `mergeWith()`, which is the operator version of `Observable.merge()`.
+- It works on infinite `Observable` instances and does not necessarily guarantee that the emissions come in any order.
+- If we have more than four `Observable<T>` sources, we can use `Observable.mergeArray()` to pass an array of `Observable` instances that we want to merge.
+
+### 2.3.b flatMap
+
+
 ### 2.3.b. Concat 
 
 ### 2.3.c. Zip
 
 ### 2.3.d. Group
 
-<br/>
-
-### 2.4. Error Handling
-
-- Handle errors using `onError()` and pass it on to the subscriber
-- Circuit breaker - Supporting resilience using `onErrorResumeNext()`
-
 <br/> 
 
-## 2.5. Concurrency & Parallelism
+## 2.4. Concurrency & Parallelism
 
-### 2.5.a. Hot vs Cold observables
-
-- 
-
-### 2.5.b. Threads
+### 2.4.a. Threads
 
 - Computation
 - IO
@@ -205,13 +201,13 @@ Support for Reactive Streams has been added to the JDK, Java 9 onwards. Several 
 - Trampoline
 - ExecutorService
 
-### 2.5.c. subscribeOn() vs observeOn()
+### 2.4.b. subscribeOn() vs observeOn()
 
 <br/>
 
-## 2.6. Backpressure
+## 2.5. Backpressure
 
-### 2.6.a. Backpressure Strategies
+### 2.5.a. Backpressure Strategies
 
 - Buffering
 - Windowing
@@ -220,15 +216,50 @@ Support for Reactive Streams has been added to the JDK, Java 9 onwards. Several 
 
 <br/>
 
-# 3. Reactor
+# 3.Project Reactor
+
+- Follows the reactive stream API. 
+- **`Flux`** : 0,1,N elements - `Flux<T>` is the main entry point for Reactor reactive streams and is similar to RxJava’s `Observable`. 
+- **`Mono`** : 0,1 elements - `Mono<T>` is like a Flux but for zero to one element.
+
+> Both `Mono` and `Flux` implement org.reactivestreams.Publisher.
+
+- **`Context`** : Since version 3.1.0, Reactor comes with an advanced feature that is somewhat comparable to ThreadLocal but applied to a `Flux` or a `Mono` instead of a Thread: the `Context`. Reactor’s `Context` is much like an immutable Map or key/value store. It is stored transparently from the `Subscriber` upward through the `Subscription`. `Context` is Reactor specific and does not work with the other Reactive Streams implementations.
+
+- **`StepVerifier`** : Reactor’s `StepVerifier` can be used to verify the behavior of a Reactor Publisher (`Flux` or `Mono`). `StepVerifier` is an interface used for testing that can be created using one of several static methods on `StepVerifier` itself.
+
+> Spring WebFlux is built on top of project reactor.
+
+- [Project Reactor Learn](https://projectreactor.io/learn)
+- [Project Reactor Documentation](https://projectreactor.io/docs/core/release/reference/)
+- [Project Reactor API](https://projectreactor.io/docs/core/release/reference/)
 
 <br/>
 
 # 4. Akka Streams
 
+- One of the interesting things about Akka Streams is that every part can be defined, is immutable, and can be reused independently.
+- Akka Streams uses the concepts of `Source` and `Sink` to correspond roughly with `Publisher` and `Subscriber` of other Reactive Streams frameworks. 
+- It also has the concept of `Flow` which is roughly equivalent to `Processor`.
+- `Graphs` are like blueprints of `Flows`, `Sinks`, or `Sources`.
+
+- **`ActorMaterializer`** : The `ActorMaterializer` in Akka Streams is similar to Schedulers in the other two Reactive Streams implementations but not the same. Unlike Schedulers, there are not several predefined singletons to choose from; instead you should generally create one for your whole application and specify some general settings.
+
+- **`Flow`**: A `Flow` has both an input and an output. So, you can define a `Flow` with only the type of the data that will be streamed, without the actual data. It is similar to `org.reactivestreams.Processor` which is both a `Publisher` and a `Subscriber`.
+
+- **`Graph`**: A `Graph` can define any arbitrary branching and recombining of streams. A `Graph` is immutable, thread- safe, and reusable. A `Graph` that is self-contained (has no input or output) is a `RunnableGraph` and can be materialized.
+
+- **`Source`**: A `Source` has exactly one output. It is a source of data, similar to a `Publisher`, and can be created in many different ways.
+
+- **`Sink`**: A `Sink` is the ending point of a stream. It represents what we do with the data. It has exactly one input.
+
+- [Akka Streams Documentation](https://doc.akka.io/docs/akka/current/stream/index.html)
+
 <br/>
 
 # 5. Smallrye Mutiny
+
+- [Smallrye Mutiny Documentation](https://smallrye.io/smallrye-mutiny/)
 
 <br/>
 

@@ -176,11 +176,14 @@ Support for Reactive Streams has been added to the JDK, Java 9 onwards. Several 
 ### 2.3.a. Merge
 
 - `Observable.merge()` will take two or more `Observable<T>` sources emitting the same type `T` and then consolidate them into a single `Observable<T>`. Alternatively, we can use `mergeWith()`, which is the operator version of `Observable.merge()`.
+
     ```java
         Observable<Integer> src1 = Observable.just(1, 2, 3, 4, 5);
         Observable<Integer> src2 = Observable.just(15, 14, 13, 12, 11);
-        Observable.merge(src1, src2, src1).subscribe(System.out::println);
+        Observable.merge(src1, src2)
+                  .subscribe(System.out::println);
     ```
+  
 - It works on infinite `Observable` instances and does not necessarily guarantee that the emissions come in any order.
 - If we have more than four `Observable<T>` sources, we can use `Observable.mergeArray()` to pass an array of `Observable` instances that we want to merge.
 

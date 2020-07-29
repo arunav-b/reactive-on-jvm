@@ -1,8 +1,8 @@
-package com.arunav.learning.rxjava.practice;
+package com.arunav.learning.rxjava.examples;
 
 import io.reactivex.Flowable;
 
-public class BasicOperatorsExample {
+public class _02BasicOperators {
 
     private static Flowable<Integer> publisher() {
         return Flowable.range(1, 100);

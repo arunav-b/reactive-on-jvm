@@ -1,4 +1,4 @@
-package com.arunav.learning.rxjava.practice;
+package com.arunav.learning.rxjava.examples;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 // Functional Programming(FP) : Functional composition + Lazy evaluation
 // Reactive programming (RP) : FP++
 
-public class BasicsExample {
+public class _01Basics {
 
     // Flowable running on a different thread
     public static Flowable<Long> create() {

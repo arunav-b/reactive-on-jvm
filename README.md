@@ -176,6 +176,11 @@ Support for Reactive Streams has been added to the JDK, Java 9 onwards. Several 
 ### 2.3.a. Merge
 
 - `Observable.merge()` will take two or more `Observable<T>` sources emitting the same type `T` and then consolidate them into a single `Observable<T>`. Alternatively, we can use `mergeWith()`, which is the operator version of `Observable.merge()`.
+    ```java
+        Observable<Integer> src1 = Observable.just(1, 2, 3, 4, 5);
+        Observable<Integer> src2 = Observable.just(15, 14, 13, 12, 11);
+        Observable.merge(src1, src2, src1).subscribe(System.out::println);
+    ```
 - It works on infinite `Observable` instances and does not necessarily guarantee that the emissions come in any order.
 - If we have more than four `Observable<T>` sources, we can use `Observable.mergeArray()` to pass an array of `Observable` instances that we want to merge.
 
@@ -238,10 +243,10 @@ Support for Reactive Streams has been added to the JDK, Java 9 onwards. Several 
 
 # 4. Akka Streams
 
-- One of the interesting things about Akka Streams is that every part can be defined, is immutable, and can be reused independently.
 - Akka Streams uses the concepts of `Source` and `Sink` to correspond roughly with `Publisher` and `Subscriber` of other Reactive Streams frameworks. 
 - It also has the concept of `Flow` which is roughly equivalent to `Processor`.
 - `Graphs` are like blueprints of `Flows`, `Sinks`, or `Sources`.
+- One of the interesting things about Akka Streams is that every part can be defined, is immutable, and can be reused independently.
 
 - **`ActorMaterializer`** : The `ActorMaterializer` in Akka Streams is similar to Schedulers in the other two Reactive Streams implementations but not the same. Unlike Schedulers, there are not several predefined singletons to choose from; instead you should generally create one for your whole application and specify some general settings.
 

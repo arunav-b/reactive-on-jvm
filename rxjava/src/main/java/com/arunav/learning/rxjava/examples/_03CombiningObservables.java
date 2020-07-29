@@ -6,6 +6,10 @@ public class _03CombiningObservables {
 
     public static void main(String[] args) {
         usingMerge();
+        usingFlatMap();
+    }
+
+    private static void usingFlatMap() {
     }
 
     private static void usingMerge() {

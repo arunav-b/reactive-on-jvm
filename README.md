@@ -12,7 +12,7 @@
 
 <br/>
 
-## 1.2. Reactive Stream API in Java 9+ -
+## 1.2. Reactive Streams API in Java 9+ -
 
 Support for Reactive Streams has been added to the JDK, Java 9 onwards. Several interfaces have been added in the `java.util.concurrent.Flow` class. The 4 primary interfaces that define reactive streams are:
 - `Publisher<T>`: A producer of items (and related control messages) received by Subscribers.
@@ -20,17 +20,46 @@ Support for Reactive Streams has been added to the JDK, Java 9 onwards. Several 
 - `Processor<T,R>`: A component that acts as both a Subscriber and Publisher.
 - `Subscription`: Message control linking a Publisher and Subscriber. A Subscriber can have multiple subscriptions to a Publisher.
 
+    ```java
+    public final class Flow {
+        private Flow() {}
+  
+        @FunctionalInterface
+        public static interface Publisher<T> {
+            public void subscribe(Subscriber<? super T> subscriber);
+        }
+  
+        public static interface Subscriber<T> {
+            public void onSubscribe(Subscription subscription);
+            public void onNext(T item);
+            public void onError(Throwable throwable);
+            public void onComplete();
+        }
+  
+        public static interface Subscription {
+            public void request(long n);
+            public void cancel();
+        }
+  
+        public static interface Processor<T,R> extends Subscriber<T>, Publisher<R> {}
+    }
+    ```
+
 <br/>
 
 ## 1.3. Reactive Streams Flow -
 
-<img src="./.images/reactive-flow.png">
+<img src="./.images/reactive-streams-flow.png">
 
-1. `Subscriber` requests `Publisher` to start streaming data by invoking the `subscribe()` method. By default streams are lazy. A `Publisher` will not start publishing data until a `Subscriber` requests.
-2. A `Publisher` enables `Subscriber` to request events be sent using the `onSubscribe()` method.
-3. `Subscriber` informs `Publisher` of the initial event demand invoking the `request()` method on `Subscription`.
-4. `Publisher` starts sending data in response to the request from `Subscriber` (using `Subscription`). The `onNext()` method is invoked by the `Subscriber`, until which a `Publisher` doesn't send data.
-5. The `onComplete()` method is called by the `Subscriber` when a `Publisher` sends a complete signal.
+1. `Subscriber` informs `Publisher` to start streaming data by invoking the `subscribe()` method. By default streams are lazy, a `Publisher` will not start publishing data until a `Subscriber` requests.
+2. On receiving the subsribe() request, Publisher creates a new `Subscription`.
+3. A `Publisher` enables `Subscriber` to request events be passing the `Subscription` using the `onSubscribe()` method.
+4. `Subscriber` informs `Publisher` of the initial event demand invoking the `request()` method on `Subscription`.
+5. `Publisher` starts sending data in response to the request from `Subscriber`. The `onNext()` method is invoked by the `Subscriber`, until which a `Publisher` doesn't send data. If there is any error while sending data, the Publisher sends an error signal. `Subscriber` can get access to the error using the `onError()` method.
+6. The `onComplete()` method is called by the `Subscriber` when a `Publisher` sends a complete signal.
+7. The `Subscriber` can send a cancel signal to the `Publisher` to stop receiving data by invoking the `cancel()` method on `Subscription`.   
+
+[Good Read on Reactive Streams Flow](https://dzone.com/articles/reactive-streams-in-java-9)
 
 <br/>
 

@@ -22,22 +22,32 @@ Support for Reactive Streams has been added to the JDK, Java 9 onwards. Several 
 
 <br/>
 
-## 1.3. Some common concepts
+## 1.3. Reactive Streams Flow -
 
-### 1.3.a. Streams
+<img src="./.images/reactive-flow.png">
+
+1. `Subscriber` requests `Publisher` to start streaming data by invoking the `subscribe()` method. By default streams are lazy. A `Publisher` will not start publishing data until a `Subscriber` requests.
+2. A `Publisher` enables `Subscriber` to request events be sent using the `onSubscribe()` method.
+3. `Subscriber` informs `Publisher` of the initial event demand invoking the `request()` method on `Subscription`.
+4. `Publisher` starts sending data in response to the request from `Subscriber` (using `Subscription`). The `onNext()` method is invoked by the `Subscriber`, until which a `Publisher` doesn't send data.
+5. The `onComplete()` method is called by the `Subscriber` when a `Publisher` sends a complete signal.
+
+## 1.4. Some common concepts
+
+### 1.4.a. Streams
 
 - The word `Observable` or `Flowable` is used to mean a reactive stream of data. Although `Observable` or `Flowable` is a type in RxJava, the other Reactive Streams libraries have other types, such as `Flux` in Reactor and `Source` in Akka Streams, that represent streams of data. Everything in Reactive Streams starts with a stream.
 
 > Difference between `Flowable` & `Observable` is that the `Flowable` has support for backpressure, `Observable` does not.
 
-### 1.3.b. Hot & Cold Observables
+### 1.4.b. Hot & Cold Observables
 
 - A **hot Observable** is one that cannot be repeated. It starts creating data immediately regardless of whether it has subscribers. Typically it involves interacting with data from the outside world such as mouse inputs, data readings, or web requests.
 - A **cold Observable** is one that can be repeated and does not start until subscribed to. This could be things like a range, file data, or a cached recording of data from a hot Observable.
 
 > Hot Observables typically are candidates for using backpressure flow control strategies such as throttling, buffers, or windows.
 
-### 1.3.c. Backpressure
+### 1.4.c. Backpressure
 
 - **Backpressure** is what happens when there are too many events/data in a stream than the downstream can handle. When this happens in the downstream application, it can cause big problems like OutOfMemory exceptions or starved threads and timeouts.
  
@@ -49,8 +59,14 @@ Support for Reactive Streams has been added to the JDK, Java 9 onwards. Several 
     - **Throttling**: Throttle first (`throttleFirst` in RxJava) drops any elements from the stream (after the first element emitted) for some given duration. Throttle last is very similar only emitting the last element emitted during the time period instead of the first. Reactor has similar methods, `sample` and `sampleFirst`. Akka Streams has a similar method named `throttle`.
     
     
-### 1.3.d. Debounce 
+### 1.4.d. Debounce 
 
+
+## 1.5. Different Reactive Streams API Implementation
+
+- RxJava
+- Project Reactor
+- Akka
     
 <br/>
 
@@ -62,31 +78,83 @@ Support for Reactive Streams has been added to the JDK, Java 9 onwards. Several 
 
 ### 2.1.a. Creating an `Observable` 
 
-- `Observable.create()`:  
+- **`Observable.create()`**:  
     The `Observable.create()` factory allows us to create an Observable by providing a lambda that accepts an Observable emitter of type `ObservableOnSubscribe` that has one method `subscribe(ObservableEmitter emitter)`. `ObservableEmitter` extends `Emitter` interface which has the 3 methods - `onNext()`, `onError()` and `onComplete()`.
+    
+    ```java
+        Observable<Integer> intSource = Observable.create(observableEmitter -> {
+            for (int i = 0; i < 100; i++)
+                observableEmitter.onNext(i);
+            observableEmitter.onComplete();
+        });
+    ```
+    
     - The emitter's `onNext()` method passes emissions or data down the chain of operators to the `Observer`. The `onNext()` is invoked inside the `Observer`, until then it is lazily evaluated in the `Observable`. 
     - `onComplete()` signals that there are no more items in the stream.
     - In case of any error on the stream the `onError()` method signals that there is an error in the data stream and no more data is sent henceforth. 
     - The `subscriber()` method on the `Observer` is overloaded multiple times, that accepts multiple functions for the different signals sent by the emitter.
     - The `onNext()`, `onComplete()`, and `onError()` methods of the emitter do not necessarily push the data directly to the final Observer. There can be another operator (like `map()` or `filter()`) between the source `Observable` and its `Observer` that acts as the next step in the chain.
+    
 
 ### 2.1.b. Some `Observable` sources
 
-- `Observable.just()`: Using `Observable.just()` we can get data from non-reactive sources. Upto 10 items can be emitted using `just()`.  
-- `Observable.fromIterable()`: We can pass a list of items in the `fromIterable()` method to create an Observable.
-- `Observable.range()`: Creates an Observable that emits a consecutive range of integers, from a specified start value and increments each subsequent value by one until the specified count is reached.  
-- `Observable.interval()`: Emits infinite values from a specified start value at specified time intervals. 
-- `Observable.empty()`: Creates an Observable that emits nothing and calls `onComplete()`. 
-- `Observable.defer()`: For Observable sources to capture changes to state we can use `Observable.defer()`, which accepts a lambda Supplier and creates an Observable for every subscription and, thus, reflects any change in its parameters.
-- `Observable.fromCallable()`: In order to pass an exception generated even before the creation of an Observable and we want to pass that down the Observable chain, we can use `Observable.fromCallable()`.
+- **`Observable.just()`**: Using `Observable.just()` we can get data from non-reactive sources. Upto 10 items can be emitted using `just()`.
 
+    ```java
+      Observable<Integer> source = Observable.just(1, 2, 3, 4, 5);
+    ``` 
+ 
+- **`Observable.fromIterable()`**: We can pass a list of items in the `fromIterable()` method to create an Observable.
+
+    ```java
+      List<String> names = List.of("Sam", "John", "Samir");
+      Observable<Integer> source = Observable.fromIterable(names);
+    ``` 
+  
+- **`Observable.range()`**: Creates an Observable that emits a consecutive range of integers, from a specified start value and increments each subsequent value by one until the specified count is reached.
+
+    ```java
+      Observable<Integer> source = Observable.range(1, 10);
+    ``` 
+      
+- **`Observable.interval()`**: Emits infinite values from a specified start value at specified time intervals. 
+
+    ```java
+      Observable<Integer> source = Observable.interval(1, TimeUnit.SECONDS);
+    ``` 
+    
+- **`Observable.empty()`**: Creates an Observable that emits nothing and calls `onComplete()`. 
+
+    ```java
+      Observable<Integer> source = Observable.empty();
+    ``` 
+  
+- **`Observable.defer()`**: For Observable sources to capture changes to state we can use `Observable.defer()`, which accepts a lambda Supplier and creates an Observable for every subscription and, thus, reflects any change in its parameters.
+
+    ```java
+      int start=1, count=5;
+      Observable<Integer> source = Observable.defer(() -> Observable.range(start, count));
+      source.subscribe(System.out::println);
+      count = 10;
+      source.subscribe(System.out::println);
+    ``` 
+  
+  In the above example, for the 2 subsriptions a new Observable is created and hence the `count` in the range is updated.
+  
+- **`Observable.fromCallable()`**: In order to pass an exception generated even before the creation of an Observable and we want to pass that down the Observable chain, we can use `Observable.fromCallable()`.
+
+    ```java
+      Observable.fromCallable(() -> 1 / 0)
+                .subscribe(System.out::println, System.out::println);
+    ``` 
+  
 > There are a few specialized flavors of `Observable` that are explicitly set up for one or no emissions: `Single`, `Maybe`, and `Completable`. 
 
 [Read More](http://reactivex.io/documentation/observable.html)
 
 ### 2.1.c. `Observer` Interface
 
-- The `Observer<T>` interface has 4 methods - `onNext()`,`onError()`, `onComplete()` and `onSubscribe()`. We already saw about the first 3 methods when we talked about `ObservableOnSubscribe`. We'll look into the other method in the next section. 
+- The `Observer<T>` interface has 4 methods - `onNext()`,`onError()`, `onComplete()` and `onSubscribe()`. We already saw about the first 3 methods when we talked about `Observable.create()`. We'll look into the other method in the next section. 
 
 ### 2.1.d. Unsubscribing:
 
@@ -173,7 +241,7 @@ Support for Reactive Streams has been added to the JDK, Java 9 onwards. Several 
 
 ## 2.3. Combining Observables: 
 
-### 2.3.a. Merge
+### 2.3.a. `merge`
 
 - `Observable.merge()` will take two or more `Observable<T>` sources emitting the same type `T` and then consolidate them into a single `Observable<T>`. Alternatively, we can use `mergeWith()`, which is the operator version of `Observable.merge()`.
 
@@ -187,14 +255,20 @@ Support for Reactive Streams has been added to the JDK, Java 9 onwards. Several 
 - It works on infinite `Observable` instances and does not necessarily guarantee that the emissions come in any order.
 - If we have more than four `Observable<T>` sources, we can use `Observable.mergeArray()` to pass an array of `Observable` instances that we want to merge.
 
-### 2.3.b flatMap
+### 2.3.b `flatMap`
 
+- `flatMap()` is used to map one emission to many emissions.
+- Just like `Observable.merge()`, `flatMap()` can also map emissions to infinite instances of `Observable` and merge them. 
+- The `Observable.merge()` operator accepts a fixed number of `Observable` sources. However, `flatMap()` dynamically adds new `Observable` sources for each value that comes in.
+- The `flatMap()` operator has an overloaded version, `flatMap(Function<T,Observable<R>> mapper, BiFunction<T,U,R> combiner)`, that allows the provision of a combiner along with the mapper function. This second combiner function associates the originally emitted `T` value with each flat-mapped `U` value and turns both into an `R` value. 
 
-### 2.3.b. Concat 
+### 2.3.b. `concat`
 
-### 2.3.c. Zip
+- 
 
-### 2.3.d. Group
+### 2.3.c. `zip`
+
+### 2.3.d. `group`
 
 <br/> 
 

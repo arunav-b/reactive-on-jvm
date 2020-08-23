@@ -12,6 +12,5 @@ public class _02BasicOperators {
         publisher().skip(10)
                 .takeWhile(i -> i < 50)
                 .subscribe(System.out::println);
-
     }
 }

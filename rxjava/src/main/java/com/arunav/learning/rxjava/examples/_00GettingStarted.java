@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 // Functional Programming(FP) : Functional composition + Lazy evaluation
 // Reactive programming (RP) : FP++
 
-public class _01Basics {
+public class _00GettingStarted {
 
     // Flowable running on a different thread
     public static Flowable<Long> create() {

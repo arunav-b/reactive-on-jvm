@@ -32,6 +32,8 @@ Support for Reactive Streams has been added to the JDK, Java 9 onwards. Several 
 4. `Publisher` starts sending data in response to the request from `Subscriber` (using `Subscription`). The `onNext()` method is invoked by the `Subscriber`, until which a `Publisher` doesn't send data.
 5. The `onComplete()` method is called by the `Subscriber` when a `Publisher` sends a complete signal.
 
+<br/>
+
 ## 1.4. Some common concepts
 
 ### 1.4.a. Streams
@@ -61,6 +63,7 @@ Support for Reactive Streams has been added to the JDK, Java 9 onwards. Several 
     
 ### 1.4.d. Debounce 
 
+<br/>
 
 ## 1.5. Different Reactive Streams API Implementation
 
